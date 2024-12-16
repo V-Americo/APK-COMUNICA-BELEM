@@ -1,0 +1,32 @@
+workflows:
+  native-android:
+    name: Native Android
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    environment:
+      android_signing:
+        - keystore_path: ./my-release-key.jks # Caminho do arquivo keystore
+          keystore_password: "Farofadenescau123@"
+          key_alias: "my-key-alias" # Substitua pelo alias que você descobriu
+          key_password: "Farofadenescau123@"
+
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+
+      - name: Build Android release
+        script: |
+          ./gradlew assembleRelease
+
+    artifacts:
+      - app/build/outputs/**/*.apk
+
+    publishing:
+      email:
+        recipients:
+          - seuemail@example.com
+        notify:
+          success: true
+          failure: false
