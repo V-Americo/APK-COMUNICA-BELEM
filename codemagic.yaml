@@ -6,10 +6,10 @@ workflows:
 
     environment:
       android_signing:
-        keystore: ./my-release-key.jks  # Caminho correto do arquivo keystore
-        keystore_password: "Farofadenescau123@"
-        key_alias: "my-key-alias"       # Alias correto obtido
-        key_password: "Farofadenescau123@"
+        - keystore: ./my-release-key.jks  # Caminho correto do arquivo keystore
+          keystore_password: "Farofadenescau123@"
+          key_alias: "my-key-alias"       # Alias correto obtido
+          key_password: "Farofadenescau123@"
 
     scripts:
       - name: Set Android SDK location
