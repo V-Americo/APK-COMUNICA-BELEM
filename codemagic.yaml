@@ -5,18 +5,13 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
-      android_signing:
-        - keystore_path: ./my-release-key.jks  # Caminho correto para o keystore
-        - keystore: ./my-release-key.jks  # Caminho correto para o keystore
-          keystore_password: Farofadenescau123@
-          key_alias: my-key-alias
-          key_password: Farofadenescau123@
-      
-      groups:
-        - google_play
-
       vars:
         PACKAGE_NAME: "io.codemagic.sample.androidnative"
+      android_signing:
+        - keystore: $ANDROID_KEYSTORE
+          keystore_password: "Farofadenescau123@"
+          key_alias: "my-key-alias"
+          key_password: "Farofadenescau123@"
 
     scripts:
       - name: Set Android SDK location
@@ -25,29 +20,12 @@ workflows:
 
       - name: Build Android release
         script: |
-          LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
-
-          if [ -z $LATEST_GOOGLE_PLAY_BUILD_NUMBER ]; then
-            UPDATED_BUILD_NUMBER=$BUILD_NUMBER
-          else
-            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
-          fi
-          ./gradlew bundleRelease -PversionCode=$UPDATED_BUILD_NUMBER -PversionName=1.0.$UPDATED_BUILD_NUMBER
+          ./gradlew assembleRelease
 
     artifacts:
-      - app/build/outputs/**/*.aab
       - app/build/outputs/**/*.apk
 
     publishing:
-      email:
-        recipients:
-          - user_1@example.com
-          - user_2@example.com
-        notify:
-          success: true
-          failure: false
-
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
-        submit_as_draft: true
