@@ -5,13 +5,11 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
+      groups:
+        - android_keystore_group  # Grupo das variáveis que criamos no painel Codemagic
+
       vars:
         PACKAGE_NAME: "io.codemagic.sample.androidnative"
-      android_signing:
-        - keystore: $ANDROID_KEYSTORE
-          keystore_password: "Farofadenescau123@"
-          key_alias: "my-key-alias"
-          key_password: "Farofadenescau123@"
 
     scripts:
       - name: Set Android SDK location
@@ -20,12 +18,33 @@ workflows:
 
       - name: Build Android release
         script: |
-          ./gradlew assembleRelease
+          LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
+          if [ -z $LATEST_GOOGLE_PLAY_BUILD_NUMBER ]; then
+            UPDATED_BUILD_NUMBER=$BUILD_NUMBER
+          else
+            UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
+          fi
+          ./gradlew bundleRelease -PversionCode=$UPDATED_BUILD_NUMBER -PversionName=1.0.$UPDATED_BUILD_NUMBER
+
+    android_signing:
+      - keystore: $ANDROID_KEYSTORE        # Referência à variável de ambiente
+        keystore_password: $ANDROID_KEYSTORE_PASSWORD
+        key_alias: $ANDROID_KEY_ALIAS
+        key_password: $ANDROID_KEY_PASSWORD
 
     artifacts:
-      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/*.aab
 
     publishing:
+      email:
+        recipients:
+          - user_1@example.com
+          - user_2@example.com
+        notify:
+          success: true
+          failure: false
+
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
+        submit_as_draft: true
