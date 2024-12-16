@@ -6,7 +6,7 @@ workflows:
 
     environment:
       groups:
-        - android_keystore_group  # Grupo das variáveis que criamos no painel Codemagic
+        - apk  # Grupo das variáveis que criamos no painel Codemagic
 
       vars:
         PACKAGE_NAME: "io.codemagic.sample.androidnative"
