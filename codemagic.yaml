@@ -7,6 +7,7 @@ workflows:
     environment:
       android_signing:
         - keystore_path: ./my-release-key.jks  # Caminho correto para o keystore
+        - keystore: ./my-release-key.jks  # Caminho correto para o keystore
           keystore_password: Farofadenescau123@
           key_alias: my-key-alias
           key_password: Farofadenescau123@
